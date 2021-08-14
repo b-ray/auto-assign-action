@@ -124,3 +124,12 @@ export async function fetchConfigurationFile(client: github.GitHub, options) {
 
   return config
 }
+
+export function chooseLabelForReviewer(
+  reviewer: string,
+  config: Config
+): string {
+  const { reviewerGroups } = config
+
+  return reviewerGroups[reviewer]
+}

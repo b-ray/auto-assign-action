@@ -7,6 +7,7 @@ import { PullRequest } from './pull_request'
 export interface Config {
   addReviewers: boolean
   addAssignees: boolean | string
+  addLabels: boolean
   reviewers: string[]
   assignees: string[]
   filterLabels?: {
@@ -20,6 +21,7 @@ export interface Config {
   useAssigneeGroups: boolean
   reviewGroups: { [key: string]: string[] }
   assigneeGroups: { [key: string]: string[] }
+  reviewerGroups: { [key: string]: string }
   runOnDraft?: boolean
 }
 
@@ -43,6 +45,7 @@ export async function handlePullRequest(
     addAssignees,
     filterLabels,
     runOnDraft,
+    addLabels,
   } = config
 
   if (skipKeywords && utils.includesSkipKeywords(title, skipKeywords)) {
@@ -115,6 +118,20 @@ export async function handlePullRequest(
       if (assignees.length > 0) {
         await pr.addAssignees(assignees)
         core.info(`Added assignees to PR #${number}: ${assignees.join(', ')}`)
+      }
+    } catch (error) {
+      core.warning(error.message)
+    }
+  }
+
+  if (addLabels) {
+    try {
+      const reviewers = pr.getReviewers()
+
+      if (reviewers.length > 0) {
+        const label = utils.chooseLabelForReviewer(reviewers[0], config)
+        await pr.addLabels([label])
+        core.info(`Added label to PR #${number}: ${label}`)
       }
     } catch (error) {
       core.warning(error.message)
