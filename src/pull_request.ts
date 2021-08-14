@@ -33,11 +33,68 @@ export class PullRequest {
     core.debug(JSON.stringify(result))
   }
 
+  async addLabels(labels: string[]): Promise<void> {
+    const { owner, repo, number: issue_number } = this.context.issue
+    const result = await this.client.issues.addLabels({
+      owner,
+      repo,
+      issue_number,
+      labels,
+    })
+    core.debug(JSON.stringify(result))
+  }
+
   hasAnyLabel(labels: string[]): boolean {
     if (!this.context.payload.pull_request) {
       return false
     }
     const { labels: pullRequestLabels = [] } = this.context.payload.pull_request
-    return pullRequestLabels.some(label => labels.includes(label.name))
+    return pullRequestLabels.some((label: { name: string }) =>
+      labels.includes(label.name)
+    )
+  }
+
+  getReviewers(): string[] {
+    if (!this.context.payload.pull_request) {
+      return []
+    }
+    const {
+      requested_reviewers: pullRequestReviewers = [],
+    } = this.context.payload.pull_request
+    return pullRequestReviewers.map(
+      (reviewer: { login: string }) => reviewer.login
+    )
+  }
+
+  getAssignees(): string[] {
+    if (!this.context.payload.pull_request) {
+      return []
+    }
+    const {
+      assignees: pullRequestAssignees = [],
+    } = this.context.payload.pull_request
+    return pullRequestAssignees.map(
+      (assignee: { login: string }) => assignee.login
+    )
+  }
+
+  getTeamAssignees(): string[] {
+    if (!this.context.payload.pull_request) {
+      return []
+    }
+    const {
+      requested_teams: pullRequestAssignees = [],
+    } = this.context.payload.pull_request
+    return pullRequestAssignees.map(
+      (assignee: { name: string }) => assignee.name
+    )
+  }
+
+  getTargetBranch(): string {
+    if (!this.context.payload.pull_request) {
+      return ''
+    }
+    const { base: base } = this.context.payload.pull_request
+    return base.ref
   }
 }
