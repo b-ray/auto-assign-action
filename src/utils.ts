@@ -40,7 +40,7 @@ export function chooseLabelForTargetBranch(
   const { branchesToLabelMap } = config
 
   let key = Object.keys(branchesToLabelMap).find(e =>
-    e.startsWith(targetBranch)
+    targetBranch.startsWith(e)
   )
   if (key) {
     return branchesToLabelMap[key]

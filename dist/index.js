@@ -337,7 +337,7 @@ function chooseLabelForReviewer(reviewer, config) {
 exports.chooseLabelForReviewer = chooseLabelForReviewer;
 function chooseLabelForTargetBranch(targetBranch, config) {
     const { branchesToLabelMap } = config;
-    let key = Object.keys(branchesToLabelMap).find(e => e.startsWith(targetBranch));
+    let key = Object.keys(branchesToLabelMap).find(e => targetBranch.startsWith(e));
     if (key) {
         return branchesToLabelMap[key];
     }
